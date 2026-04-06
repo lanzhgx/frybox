@@ -4,6 +4,22 @@ A terminal app built for managing multiple CLI sessions with clear visual identi
 
 ![macOS](https://img.shields.io/badge/platform-macOS-lightgrey)
 
+## Screenshots
+
+### Named sessions with split panes (Light theme)
+
+![Split panes](docs/03-multiple-tabs.png)
+
+Three color-coded session tabs, each with named split panes. The focused pane gets a colored accent bar.
+
+### Dark theme
+
+![Dark theme](docs/04-dark-theme.png)
+
+### Monokai theme
+
+![Monokai theme](docs/05-monokai-theme.png)
+
 ## Features
 
 - **Named sessions (tabs)** — each tab has a large, prominent name in the titlebar
