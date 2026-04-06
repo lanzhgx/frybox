@@ -1,0 +1,7 @@
+node_modules/
+dist/
+icon.ppm
+icon.png
+*.dmg
+*.blockmap
+.DS_Store

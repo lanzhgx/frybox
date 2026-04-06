@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frybox</title>
+  <link rel="stylesheet" href="../node_modules/xterm/css/xterm.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="light">
+  <div id="app">
+
+    <!-- Title bar -->
+    <div id="titlebar">
+      <div id="window-controls-spacer"></div>
+
+      <div id="session-name-area">
+        <div id="session-name-display">
+          <span id="session-color-swatch"></span>
+          <span id="session-name-text" title="Double-click or press ⌘⇧R to rename">Untitled</span>
+          <button id="rename-btn" title="Rename session">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M13.23 1a2.4 2.4 0 0 1 1.7 4.1L4.53 15.4l-4 .57.57-4L11.53 1.7A2.4 2.4 0 0 1 13.23 1zm0 1.4a1 1 0 0 0-.71.29L11.3 3.9l.8.8 1.22-1.22a1 1 0 0 0-.71-1.71zM3.7 14.3l2.3-.33-1.97-1.97-.33 2.3zM4.9 11.3l5.7-5.7.8.8-5.7 5.7-.8-.8z"/>
+            </svg>
+          </button>
+        </div>
+        <input id="session-name-input" type="text" placeholder="Session name..." autocomplete="off" spellcheck="false">
+      </div>
+
+      <div id="titlebar-actions">
+        <!-- Theme picker -->
+        <select id="theme-select" title="Switch theme">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="solarized-dark">Solarized</option>
+          <option value="monokai">Monokai</option>
+        </select>
+
+        <button id="split-v-btn" title="Split right (⌘D)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2 2h12v12H2V2zm1 1v10h4.5V3H3zm5.5 0v10H13V3H8.5z"/>
+          </svg>
+        </button>
+        <button id="split-h-btn" title="Split down (⌘⇧D)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2 2h12v12H2V2zm1 1v4.5h10V3H3zm0 5.5V13h10V8.5H3z"/>
+          </svg>
+        </button>
+        <button id="new-session-btn" title="New session (⌘T)">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 1a.75.75 0 0 1 .75.75v5.5h5.5a.75.75 0 0 1 0 1.5h-5.5v5.5a.75.75 0 0 1-1.5 0v-5.5H1.75a.75.75 0 0 1 0-1.5h5.5V1.75A.75.75 0 0 1 8 1z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="session-color-bar"></div>
+    </div>
+
+    <!-- Tab bar -->
+    <div id="tabbar">
+      <div id="tabs-scroll"></div>
+    </div>
+
+    <!-- Terminal area: sessions rendered here with pane splits -->
+    <div id="terminals"></div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
