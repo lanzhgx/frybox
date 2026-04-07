@@ -241,18 +241,48 @@ async function createPane(sessionId, paneName) {
 
   terminal.open(termContainer);
 
-  const pane = { id, sessionId, label, terminal, fitAddon, element, header, nameSpan, nameInput };
+  // Fix: intercept wheel events so scrolling always moves the viewport
+  // instead of being forwarded as arrow keys to the running application
+  // (e.g. Claude Code interprets Up arrow as command history navigation)
+  termContainer.addEventListener('wheel', (e) => {
+    const buf = terminal.buffer.active;
+    const hasScrollback = buf.baseY > 0;
+    const atTop = buf.viewportY === 0;
+    const atBottom = buf.viewportY === buf.baseY;
+    const scrollingUp = e.deltaY < 0;
+    const scrollingDown = e.deltaY > 0;
+
+    // If there's scrollback content and we're not already at the boundary,
+    // scroll the viewport instead of letting xterm forward to the app
+    if (hasScrollback && !(scrollingUp && atTop) && !(scrollingDown && atBottom)) {
+      e.preventDefault();
+      e.stopPropagation();
+      const lines = Math.ceil(Math.abs(e.deltaY) / 20);
+      terminal.scrollLines(scrollingUp ? -lines : lines);
+    }
+  }, { capture: true });
+
+  // Auto-refit terminal whenever its container is resized (splits, window resize, drag handle)
+  let ptyCreated = false;
+  const paneResizeObserver = new ResizeObserver(() => {
+    try { fitAddon.fit(); } catch (_) {}
+  });
+  paneResizeObserver.observe(termContainer);
+
+  const pane = { id, sessionId, label, terminal, fitAddon, element, header, nameSpan, nameInput, resizeObserver: paneResizeObserver };
   panes.set(id, pane);
 
   // Defer PTY creation until element is in DOM and has size
-  requestAnimationFrame(async () => {
+  // Use double-rAF to ensure CSS layout is computed after split rendering
+  requestAnimationFrame(() => requestAnimationFrame(async () => {
     fitAddon.fit();
     const { cols, rows } = terminal;
     const result = await ipcRenderer.invoke('pty:create', id, cols, rows);
     if (result && result.error) {
       terminal.writeln(`\x1b[31mFailed to start shell: ${result.error}\x1b[0m`);
     }
-  });
+    ptyCreated = true;
+  }));
 
   // PTY ↔ terminal wiring
   ipcRenderer.on(`pty:data:${id}`, (_, data) => terminal.write(data));
@@ -268,6 +298,7 @@ async function createPane(sessionId, paneName) {
 function destroyPane(id) {
   const pane = panes.get(id);
   if (!pane) return;
+  if (pane.resizeObserver) pane.resizeObserver.disconnect();
   ipcRenderer.send('pty:kill', id);
   ipcRenderer.removeAllListeners(`pty:data:${id}`);
   ipcRenderer.removeAllListeners(`pty:exit:${id}`);
