@@ -120,8 +120,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  -webkit-app-region: no-drag;
   min-width: 0;
+}
+
+#session-name-display {
+  -webkit-app-region: no-drag;
+}
+
+#session-name-input {
+  -webkit-app-region: no-drag;
 }
 
 #session-name-display {

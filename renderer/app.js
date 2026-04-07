@@ -453,7 +453,7 @@ function closeSession(id) {
       sessionColorSw.style.backgroundColor = 'transparent';
       sessionColorBar.style.backgroundColor = 'transparent';
       ipcRenderer.send('session:title', null);
-      createSession();
+      ipcRenderer.send('app:quit');
     }
   }
 }
@@ -520,6 +520,15 @@ function switchToSession(id) {
   // Render the layout and fit all panes
   renderSessionLayout(id);
 
+  // Extra delayed fit to handle terminals opened while container was hidden
+  // (terminal.open() on a zero-sized container needs a fit after layout settles)
+  setTimeout(() => {
+    getAllPaneIds(session.layout).forEach(pid => {
+      const p = panes.get(pid);
+      if (p) { try { p.fitAddon.fit(); } catch (_) {} }
+    });
+  }, 50);
+
   // Focus the previously focused pane in this session, or the first one
   const paneIds = getAllPaneIds(session.layout);
   if (paneIds.includes(focusedPaneId)) {
@@ -557,15 +566,16 @@ function renderSessionLayout(sessionId) {
   session.wrapEl.innerHTML = '';
   buildLayoutDOM(session.layout, session.wrapEl);
 
-  // Fit all panes after layout
-  requestAnimationFrame(() => {
+  // Fit all panes after layout — use double-rAF to ensure CSS layout is fully
+  // computed (especially when session wrapper just became visible via .active)
+  requestAnimationFrame(() => requestAnimationFrame(() => {
     getAllPaneIds(session.layout).forEach(pid => {
       const p = panes.get(pid);
       if (p) {
         try { p.fitAddon.fit(); } catch (_) {}
       }
     });
-  });
+  }));
 }
 
 function buildLayoutDOM(node, container) {

@@ -172,6 +172,8 @@ ipcMain.on('pty:kill', (event, id) => {
   }
 });
 
+ipcMain.on('app:quit', () => app.quit());
+
 ipcMain.on('session:title', (event, name) => {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.setTitle(name ? `${name} — Frybox` : 'Frybox');
