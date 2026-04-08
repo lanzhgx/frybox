@@ -156,7 +156,10 @@ async function createPane(sessionId, paneName) {
 
   const fitAddon = new FitAddon();
   terminal.loadAddon(fitAddon);
-  terminal.loadAddon(new WebLinksAddon());
+  terminal.loadAddon(new WebLinksAddon((event, uri) => {
+    event.preventDefault();
+    require('electron').shell.openExternal(uri);
+  }));
 
   // Create the pane DOM element (persists for the life of the pane)
   const element = document.createElement('div');

@@ -19,6 +19,11 @@ function createWindow() {
     },
   });
 
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    require('electron').shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
   mainWindow.loadFile('renderer/index.html');
   buildMenu('light');
 }
